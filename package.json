@@ -1,0 +1,48 @@
+{
+  "name": "csp-report-logger",
+  "version": "1.0.0",
+  "description": "Log Content Security Policy violation reports.",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "devel": "npx nodemon app.js --config=/etc/default/csp-logger",
+    "server": "node app.js --config=/etc/default/csp-logger"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/revolution-robotics/csp-logger.git"
+  },
+  "keywords": [
+    "csp",
+    "logger"
+  ],
+  "author": "Andrew L. Moore",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/revolution-robotics/csp-logger/issues"
+  },
+  "homepage": "https://github.com/revolution-robotics/csp-logger#readme",
+  "dependencies": {
+    "ini": "^3.0.0",
+    "koa": "^2.13.4",
+    "koa-bodyparser": "^4.3.0",
+    "minimist": "^1.2.6"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.13.14",
+    "@babel/preset-env": "^7.13.15",
+    "standard": "^16.0.3"
+  },
+  "standard": {
+    "parser": "@babel/eslint-parser"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ],
+    "plugins": [
+      "@babel/plugin-syntax-top-level-await"
+    ]
+  }
+}
