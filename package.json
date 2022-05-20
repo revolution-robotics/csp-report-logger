@@ -1,6 +1,6 @@
 {
   "name": "csp-report-logger",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Log Content Security Policy violation reports.",
   "bin": "app.js",
   "type": "module",

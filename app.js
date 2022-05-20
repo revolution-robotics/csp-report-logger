@@ -23,7 +23,14 @@ if (argv.help || argv.h) {
   console.log(`OPTIONS:
     --config=CONFIG  PATH of config file (default: /etc/default/csp-report-logger)
     --log=PATH       PATH of log file (default: /var/log/csp.log)
-    --port=N         Port to listen on (default: 8080)`)
+    --port=N         Port to listen on (default: 8080)
+    --help           Print this help, then exit
+    --version        Print version, then exit`)
+  process.exit(0)
+} else if (argv.version || argv.v) {
+  const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+
+  console.log(`${pkgJson.name} v${pkgJson.version}`)
   process.exit(0)
 }
 
