@@ -21,13 +21,13 @@ const argv = parseArgs(process.argv.slice(2))
 if (argv.help || argv.h) {
   console.log(`Usage: ${pgm} OPTIONS`)
   console.log(`OPTIONS:
-    --config=CONFIG  PATH of config file (default: /etc/default/csp-logger)
+    --config=CONFIG  PATH of config file (default: /etc/default/csp-report-logger)
     --log=PATH       PATH of log file (default: /var/log/csp.log)
     --port=N         Port to listen on (default: 8080)`)
   process.exit(0)
 }
 
-const configfile = argv.config || '/etc/default/csp-logger'
+const configfile = argv.config || '/etc/default/csp-report-logger'
 
 if (fs.existsSync(configfile)) {
   const config = ini.parse(fs.readFileSync(argv.config, 'utf-8'))

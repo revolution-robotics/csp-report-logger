@@ -1,17 +1,17 @@
 {
   "name": "csp-report-logger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Log Content Security Policy violation reports.",
-  "main": "app.js",
+  "bin": "app.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "devel": "npx nodemon app.js --config=/etc/default/csp-logger",
-    "server": "node app.js --config=/etc/default/csp-logger"
+    "devel": "npx nodemon app.js --config=/etc/default/csp-report-logger",
+    "server": "node app.js --config=/etc/default/csp-report-logger"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/revolution-robotics/csp-logger.git"
+    "url": "git+https://github.com/revolution-robotics/csp-report-logger.git"
   },
   "keywords": [
     "csp",
@@ -20,9 +20,9 @@
   "author": "Andrew L. Moore",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/revolution-robotics/csp-logger/issues"
+    "url": "https://github.com/revolution-robotics/csp-report-logger/issues"
   },
-  "homepage": "https://github.com/revolution-robotics/csp-logger#readme",
+  "homepage": "https://github.com/revolution-robotics/csp-report-logger#readme",
   "dependencies": {
     "ini": "^3.0.0",
     "koa": "^2.13.4",
