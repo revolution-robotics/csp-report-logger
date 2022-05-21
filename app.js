@@ -7,6 +7,8 @@
 // This script sanitizes and logs Content Security Policy violation
 // reports - see, e.g.: https://w3c.github.io/webappsec-csp/
 //
+import http from 'http'
+import https from 'https'
 import Koa from 'koa'
 import koaBodyParser from 'koa-bodyparser'
 import parseArgs from 'minimist'
@@ -15,26 +17,25 @@ import fs from 'fs'
 import fsPromises from 'fs/promises'
 
 const app = new Koa()
-const pgm = process.argv[1].replace(/^.*\//, '')
 const argv = parseArgs(process.argv.slice(2))
+const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 
-if (argv.help || argv.h) {
-  console.log(`Usage: ${pgm} OPTIONS`)
+if (argv.h || argv.help) {
+  console.log(`Usage: ${pkgJson.name} OPTIONS`)
   console.log(`OPTIONS:
-    --config=CONFIG  PATH of config file (default: /etc/default/csp-report-logger)
-    --log=PATH       PATH of log file (default: /var/log/csp.log)
-    --port=N         Port to listen on (default: 8080)
-    --help           Print this help, then exit
-    --version        Print version, then exit`)
+    -c | --config=CONFIG  PATH of config file (default: /etc/default/csp-report-logger)
+    -l | --log=PATH       PATH of log file (default: /var/log/csp.log)
+    -p | --port=N         Port to listen on (default: 8080)
+    -h | --help           Print this help, then exit
+    -v | --version        Print version, then exit`)
   process.exit(0)
-} else if (argv.version || argv.v) {
-  const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+} else if (argv.v || argv.version) {
 
   console.log(`${pkgJson.name} v${pkgJson.version}`)
   process.exit(0)
 }
 
-const configfile = argv.config || '/etc/default/csp-report-logger'
+const configfile = argv.c || argv.config || '/etc/default/csp-report-logger'
 
 if (fs.existsSync(configfile)) {
   const config = ini.parse(fs.readFileSync(argv.config, 'utf-8'))
@@ -48,8 +49,8 @@ if (fs.existsSync(configfile)) {
   }
 }
 
-const port = argv.port || 8080
-const logfile = argv.log || '/var/log/csp.log'
+const port = argv.p || argv.port || 8080
+const logfile = argv.l || argv.log || '/var/log/csp.log'
 const allowedReportKeys = [
   'blocked-uri',
   'column-number',
@@ -69,8 +70,6 @@ const requiredReportKeys = [
   'document-uri',
   'effective-directive'
 ]
-
-console.log(`Listening on port: ${port}`)
 
 const validateCSPReport = (json) => {
   if (!('csp-report' in json)) {
@@ -108,12 +107,10 @@ app.use(async ctx => {
   let cspReport = {}
 
   try {
-    cspReport = await validateCSPReport(JSON.parse(ctx.request.rawBody))
+    if (!(cspReport = await validateCSPReport(JSON.parse(ctx.request.rawBody)))) {
+      return (ctx.status = 422)
+    }
   } catch (SyntaxError) {
-    return (ctx.status = 422)
-  }
-
-  if (!cspReport) {
     return (ctx.status = 422)
   }
 
@@ -128,4 +125,22 @@ app.use(async ctx => {
   })
   return (ctx.status = 200)
 })
-app.listen(port)
+
+const server = http.createServer(app.callback())
+
+server.on('error', err => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`csp-report-logger: Error: Address already in use :::${port}`)
+    process.exit(1)
+  }
+
+  throw err
+})
+
+server.on('listening', () => {
+  console.log(`csp-report-logger
+* Listening on http://0.0.0.0:${port}
+* Listening on http://[::]:${port}`)
+})
+
+server.listen(port)
