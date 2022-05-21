@@ -8,8 +8,9 @@ report to a log file.
 
     Usage: csp-report-logger OPTIONS
     OPTIONS:
-        -c | --config=CONFIG  PATH of config file (default: /etc/default/csp-report-logger)
-        -l | --log=PATH       PATH of log file (default: /var/log/csp.log)
-        -p | --port=N         Port to listen on (default: 8080)
-        -h | --help           Print this help, then exit
-        -v | --version        Print version, then exit
+        -c | --config=PATH   PATH of config file
+                             (default: /etc/default/csp-report-logger)
+        -l | --log=PATH      PATH of log file (default: /var/log/csp.log)
+        -p | --port=N        Port to listen on (default: 8080)
+        -h | --help          Print this help, then exit
+        -v | --version       Print version, then exit`)

@@ -23,14 +23,14 @@ const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 if (argv.h || argv.help) {
   console.log(`Usage: ${pkgJson.name} OPTIONS`)
   console.log(`OPTIONS:
-    -c | --config=CONFIG  PATH of config file (default: /etc/default/csp-report-logger)
-    -l | --log=PATH       PATH of log file (default: /var/log/csp.log)
-    -p | --port=N         Port to listen on (default: 8080)
-    -h | --help           Print this help, then exit
-    -v | --version        Print version, then exit`)
+    -c | --config=PATH   PATH of config file
+                         (default: /etc/default/csp-report-logger)
+    -l | --log=PATH      PATH of log file (default: /var/log/csp.log)
+    -p | --port=N        Port to listen on (default: 8080)
+    -h | --help          Print this help, then exit
+    -v | --version       Print version, then exit`)
   process.exit(0)
 } else if (argv.v || argv.version) {
-
   console.log(`${pkgJson.name} v${pkgJson.version}`)
   process.exit(0)
 }
@@ -73,7 +73,7 @@ const requiredReportKeys = [
 
 const validateCSPReport = (json) => {
   if (!('csp-report' in json)) {
-    return null
+    throw new Error('Invalid CSP object')
   }
 
   const cspReport = {}
@@ -90,16 +90,14 @@ const validateCSPReport = (json) => {
     cspReport['effective-directive'] = json['csp-report']['violated-directive']
   }
 
-  let validReport = true
-
   // Sanity check CSP report.
   requiredReportKeys.forEach(key => {
     if (!(key in cspReport)) {
-      validReport = false
+      throw new Error(`CSP object missing required key ${key}`)
     }
   })
 
-  return validReport ? cspReport : null
+  return cspReport
 }
 
 app.use(koaBodyParser())
@@ -107,10 +105,9 @@ app.use(async ctx => {
   let cspReport = {}
 
   try {
-    if (!(cspReport = await validateCSPReport(JSON.parse(ctx.request.rawBody)))) {
-      return (ctx.status = 422)
-    }
-  } catch (SyntaxError) {
+    cspReport = await validateCSPReport(JSON.parse(ctx.request.rawBody))
+  } catch (err) {
+    console.log(`csp-report-logger: ${err.name}: ${err.message}`)
     return (ctx.status = 422)
   }
 
